@@ -46,8 +46,17 @@ This is the easiest way to get the application running with all dependencies.
    ```
 
 4. Once the containers are healthy, access the application:
-   - Frontend: http://localhost
+   - Frontend: http://localhost:3001
    - Backend API: http://localhost:8080
+
+
+Open up the page at http://localhost:3001. Then key in the URL you wish to generate the redirect for and press "Shorten URL".
+
+![Original URL](docs/images/url.png)
+
+You will get a shortened URL generated after a short while. Copy the URL and paste it into the URL bar. Then you will be redirected to the original URL.
+
+![Shortened URL](docs/images/shortened_url.png)
 
 ### Local Development (Without Docker)
 If you prefer to run the services directly on your machine for development:
@@ -64,7 +73,7 @@ If you prefer to run the services directly on your machine for development:
    ```
 
 3. Create a `.env` file in the server directory with the following (adjust as needed):
-   ```
+   ```dotenv
    POSTGRES_USER=postgres
    POSTGRES_PASSWORD=postgres
    POSTGRES_DB=url_shortener
@@ -156,12 +165,3 @@ go test ./... -v
   - The module should be defined as `module url_shortener`
   - Ensure all imports use the correct path: `url_shortener/models` etc.
 
-## Screenshots
-
-Open up the page at http://localhost:3001. Then key in the URL you wish to generate the redirect for and press "Shorten URL".
-
-![Original URL](docs/images/url.png)
-
-You will get a shortened URL generated after a short while. Copy the URL and paste it into the URL bar. Then you will be redirected to the original URL.
-
-![Shortened URL](docs/images/shortened_url.png)
