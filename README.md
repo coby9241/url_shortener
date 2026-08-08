@@ -25,12 +25,12 @@ This is the easiest way to get the application running with all dependencies.
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/coby9241/url_shortener
    cd url_shortener
    ```
 
 2. Create a `.env` file in the `server` directory (if not already present) with the following variables:
-   ```
+   ```dotenv
    POSTGRES_USER=postgres
    POSTGRES_PASSWORD=postgres
    POSTGRES_DB=url_shortener
@@ -157,11 +157,11 @@ go test ./... -v
   - Ensure all imports use the correct path: `url_shortener/models` etc.
 
 ## Screenshots
-![Frontend Home Page](path/to/frontend-screenshot.png)
-*Caption: The frontend home page showing the URL shortener interface.*
 
-![API Documentation or Backend Response](path/to/backend-screenshot.png)
-*Caption: Example of API response or backend logs.*
+Open up the page at http://localhost:3001. Then key in the URL you wish to generate the redirect for and press "Shorten URL".
 
-## Further Help
-For any additional questions or issues, please refer to the project documentation or open an issue in the repository.
+![Original URL](docs/images/url.png)
+
+You will get a shortened URL generated after a short while. Copy the URL and paste it into the URL bar. Then you will be redirected to the original URL.
+
+![Shortened URL](docs/images/shortened_url.png)
