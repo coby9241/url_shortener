@@ -21,7 +21,7 @@ services:
       args:
         REACT_APP_API_URL: http://localhost:8080
     ports:
-      - "80:80"
+      - "3001:80"
     depends_on:
       - server
     restart: unless-stopped
