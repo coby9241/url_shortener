@@ -105,7 +105,7 @@ If you prefer to run the services directly on your machine for development:
    ```bash
    npm start
    ```
-   The frontend will be available at http://localhost:3000 (proxy set to backend via package.json setup in Docker, but for local dev you may need to adjust)
+   The frontend will be available at http://localhost:3001 (proxy set to backend via package.json setup in Docker, but for local dev you may need to adjust)
 
    Note: For local development without Docker, you may need to set the `REACT_APP_API_URL` environment variable in the client to point to your backend (e.g., `http://localhost:8080`). You can do this by creating a `.env` file in the client directory:
    ```
