@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"strings"
 
 	"url_shortener/controllers"
 	"url_shortener/db"
@@ -43,8 +44,19 @@ func main() {
 		log.Printf("Recovery from panic: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 	}))
+	corsOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
+	var allowOrigins []string
+	if corsOrigins == "" {
+		allowOrigins = []string{"http://localhost"}
+	} else {
+		parts := strings.Split(corsOrigins, ",")
+		allowOrigins = make([]string, 0, len(parts))
+		for _, p := range parts {
+			allowOrigins = append(allowOrigins, strings.TrimSpace(p))
+		}
+	}
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost"},
+		AllowOrigins:     allowOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
 		AllowCredentials: true,
