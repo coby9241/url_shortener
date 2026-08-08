@@ -15,7 +15,6 @@ import (
 
 const (
 	minHashLength = 7
-	maxAttempts   = 4
 )
 
 type URLController struct {
@@ -75,14 +74,18 @@ func (uc *URLController) ShortenURL(c *gin.Context) {
 	var shortURL string
 	var success bool
 
-	// Retry loop: start with length 7, up to maxAttempts (4) attempts.
-	// On each attempt after the first, append salt to the input string.
-	for attempt := 0; attempt < maxAttempts; attempt++ {
+	// Retry loop: start with length 7, try with progressively more salt characters on each retry.
+	// We terminate when we've used all characters in the salt.
+	maxAttempt := len(uc.salt)
+	if maxAttempt == 0 {
+		maxAttempt = 1 // Still try once even if salt is empty
+	}
+	for attempt := 0; attempt < maxAttempt; attempt++ {
 		length := minHashLength + attempt
 		input := longURL
 		if attempt > 0 {
-			// Append salt for each retry after the first
-			input = longURL + strings.Repeat(uc.salt, attempt)
+			// Append progressively more characters of salt for each retry after the first
+			input = longURL + uc.salt[:attempt]
 		}
 		hash := utils.GenerateURLHash(input, length)
 
@@ -110,7 +113,7 @@ func (uc *URLController) ShortenURL(c *gin.Context) {
 	}
 
 	if !success {
-		c.JSON(http.StatusConflict, gin.H{"error": "Failed to generate unique short URL after " + strconv.Itoa(maxAttempts) + " attempts due to collision"})
+		c.JSON(http.StatusConflict, gin.H{"error": "Failed to generate unique short URL after " + strconv.Itoa(maxAttempt) + " attempts due to collision"})
 		return
 	}
 

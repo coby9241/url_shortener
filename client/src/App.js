@@ -23,9 +23,7 @@ function App() {
       setLoading(true);
       setError('');
       const response = await shortenURL(longUrl.trim());
-      setShortUrl(response.shortUrl);
-      // Redirect to the short URL (will be handled by server redirect)
-      window.location.href = response.shortUrl;
+      setShortUrl(response.short_url);
     } catch (err) {
       setError(err.message || 'Failed to shorten URL');
       setShortUrl(null);
