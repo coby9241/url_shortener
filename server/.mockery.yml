@@ -1,0 +1,7 @@
+packages:
+  url_shortener/repositories:
+    config:
+      all: true
+      dir: ./mocks
+      structname: 'Mock{{.InterfaceName}}'
+      outpkg: 'mocks'
