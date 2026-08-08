@@ -7,35 +7,30 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"url_shortener/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"gorm.io/gorm"
+
+	"url_shortener/mocks"
+	"url_shortener/models"
 )
-
-// MockURLRepository is a mock implementation of repositories.URLRepository using testify mock.
-type MockURLRepository struct {
-	mock.Mock
-}
-
-func (m *MockURLRepository) Create(url *models.URL) error {
-	args := m.Called(url)
-	return args.Error(0)
-}
 
 func TestURLController_ShortenURL(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	t.Run("successful shorten on first attempt (length 7)", func(t *testing.T) {
-		mockRepo := new(MockURLRepository)
+		mockRepo := new(mocks.MockURLRepository)
+
+		// URL does not exist yet - return ErrRecordNotFound
+		mockRepo.On("FindByLongURL", "https://example.com").Return(nil, gorm.ErrRecordNotFound).Once()
 
 		// Set up mock expectation for length 7
 		mockRepo.On("Create", mock.MatchedBy(func(u *models.URL) bool {
 			return len(u.ShortURL) == 7 && u.LongURL == "https://example.com"
 		})).Return(nil).Once()
 
-		controller := NewURLController(mockRepo, "http://localhost:8080")
+		controller := NewURLController(mockRepo, "http://localhost:8080", "abcd")
 
 		r := gin.New()
 		r.POST("/shorten", controller.ShortenURL)
@@ -70,7 +65,10 @@ func TestURLController_ShortenURL(t *testing.T) {
 	})
 
 	t.Run("shorten succeeds on retry (first fails with duplicate, second passes, length 8)", func(t *testing.T) {
-		mockRepo := new(MockURLRepository)
+		mockRepo := new(mocks.MockURLRepository)
+
+		// URL does not exist yet - return ErrRecordNotFound
+		mockRepo.On("FindByLongURL", "https://example.com").Return(nil, gorm.ErrRecordNotFound).Once()
 
 		// First call (length 7) returns duplicate key error
 		mockRepo.On("Create", mock.MatchedBy(func(u *models.URL) bool {
@@ -82,7 +80,7 @@ func TestURLController_ShortenURL(t *testing.T) {
 			return len(u.ShortURL) == 8 && u.LongURL == "https://example.com"
 		})).Return(nil).Once()
 
-		controller := NewURLController(mockRepo, "http://localhost:8080")
+		controller := NewURLController(mockRepo, "http://localhost:8080", "abcd")
 
 		r := gin.New()
 		r.POST("/shorten", controller.ShortenURL)
@@ -111,7 +109,10 @@ func TestURLController_ShortenURL(t *testing.T) {
 	})
 
 	t.Run("conflict error when all 4 attempts fail due to collision", func(t *testing.T) {
-		mockRepo := new(MockURLRepository)
+		mockRepo := new(mocks.MockURLRepository)
+
+		// URL does not exist yet - return ErrRecordNotFound
+		mockRepo.On("FindByLongURL", "https://example.com").Return(nil, gorm.ErrRecordNotFound).Once()
 
 		// All 4 attempts (lengths 7, 8, 9, 10) return duplicate key error
 		for i := 0; i < 4; i++ {
@@ -121,7 +122,7 @@ func TestURLController_ShortenURL(t *testing.T) {
 			})).Return(gorm.ErrDuplicatedKey).Once()
 		}
 
-		controller := NewURLController(mockRepo, "http://localhost:8080")
+		controller := NewURLController(mockRepo, "http://localhost:8080", "abcd")
 
 		r := gin.New()
 		r.POST("/shorten", controller.ShortenURL)
@@ -141,14 +142,17 @@ func TestURLController_ShortenURL(t *testing.T) {
 	})
 
 	t.Run("internal server error immediately on non-collision DB error", func(t *testing.T) {
-		mockRepo := new(MockURLRepository)
+		mockRepo := new(mocks.MockURLRepository)
+
+		// URL does not exist yet - return ErrRecordNotFound
+		mockRepo.On("FindByLongURL", "https://example.com").Return(nil, gorm.ErrRecordNotFound).Once()
 
 		// First call returns a generic database error and aborts immediately
 		mockRepo.On("Create", mock.MatchedBy(func(u *models.URL) bool {
 			return len(u.ShortURL) == 7 && u.LongURL == "https://example.com"
 		})).Return(errors.New("connection reset by peer")).Once()
 
-		controller := NewURLController(mockRepo, "http://localhost:8080")
+		controller := NewURLController(mockRepo, "http://localhost:8080", "abcd")
 
 		r := gin.New()
 		r.POST("/shorten", controller.ShortenURL)

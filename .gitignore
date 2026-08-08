@@ -2,3 +2,4 @@ server/data
 client/node_modules
 
 .idea
+*/url_shortener
