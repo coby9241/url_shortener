@@ -1,0 +1,4 @@
+issues:
+  exclude-dirs:
+    - mocks
+    - internal/mocks
