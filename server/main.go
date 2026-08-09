@@ -37,6 +37,7 @@ func main() {
 		salt = "fixed_salt_change_in_production" // default for development
 	}
 	controller := controllers.NewURLController(repo, baseURL, salt)
+	healthController := controllers.NewHealthController()
 
 	r := gin.New()
 	r.Use(gin.Logger())
@@ -67,6 +68,7 @@ func main() {
 	})
 	r.POST("/api/v1/shorten", controller.ShortenURL)
 	r.GET("/:shortURL", controller.RedirectURL)
+	r.GET("/health", healthController.HealthCheck)
 
 	srv := &http.Server{
 		Addr:    ":8080",
