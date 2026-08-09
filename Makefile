@@ -12,11 +12,14 @@ help:
 # Generate mocks using mockery
 generate-mocks:
 	@echo "Generating mocks..."
-	@which mockery >/dev/null 2>&1 || { \
-		echo "mockery not found. Installing..."; \
-		go install github.com/vektra/mockery/v2@v2.53.6; \
-	}
-	cd server && mockery --dir=./repositories --output=./mocks --all --keep-header --filename=mock_{interface}.go
+	@export GOBIN=$${GOBIN:-$$HOME/go/bin}; \
+	echo "GOBIN after export: $$GOBIN"; \
+	export PATH=$$GOBIN:$$PATH; \
+	if ! which mockery >/dev/null 2>&1; then \
+	    echo "mockery not found. Installing..."; \
+	    go install github.com/vektra/mockery/v2@v2.53.6; \
+	fi; \
+	cd server && $$GOBIN/mockery
 	@echo "Mocks generated successfully in ./server/mocks/"
 
 # Run tests

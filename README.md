@@ -142,7 +142,7 @@ If you prefer to run the command manually:
 
 ```bash
 # Install mockery if not present
-go install github.com/vektra/mockery/v2@v2.28.2
+go install github.com/vektra/mockery/v2@v2.53.6
 
 # Generate mocks from the server directory
 cd server && mockery --dir=./repositories --output=./mocks --all --keep-header --filename=mock_{interface}.go
@@ -162,7 +162,7 @@ go test ./... -v
 ### Troubleshooting
 - **"mockery: command not found"**
   - Run `make generate-mocks` which will automatically install mockery
-  - Or install manually: `go install github.com/vektra/mockery/v2@v2.28.2`
+  - Or install manually: `go install github.com/vektra/mockery/v2@v2.53.6`
 
 - **Import path errors when generating mocks**
   - Ensure you're running the command from the project root or server directory correctly
