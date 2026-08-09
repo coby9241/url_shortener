@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
+
 	"url_shortener/models"
 
 	"gorm.io/driver/postgres"
@@ -14,11 +16,30 @@ import (
 
 // InitDB initializes GORM database using PostgreSQL and performs auto-migration.
 func InitDB() (*gorm.DB, error) {
-	// Load .env file
+	// Load .env file (for local development)
 	if err := godotenv.Load(); err != nil {
 		log.Printf("Warning: Error loading .env file: %v", err)
 	}
 
+	// Check for DATABASE_URL first (used by Render, Heroku, etc.)
+	if databaseURL := os.Getenv("DATABASE_URL"); databaseURL != "" {
+		// Render's PostgreSQL may provide "postgres://" but gorm expects "postgresql://"
+		if strings.HasPrefix(databaseURL, "postgres://") {
+			databaseURL = strings.Replace(databaseURL, "postgres://", "postgresql://", 1)
+		}
+		database, err := gorm.Open(postgres.Open(databaseURL), &gorm.Config{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to connect to database: %w", err)
+		}
+
+		// Auto-migrate URL model
+		if err := database.AutoMigrate(&models.URL{}); err != nil {
+			return nil, fmt.Errorf("failed to auto-migrate URL schema: %w", err)
+		}
+		return database, nil
+	}
+
+	// Fallback to individual parameters (existing logic)
 	host := os.Getenv("DB_HOST")
 	if host == "" {
 		host = "localhost"
@@ -47,8 +68,7 @@ func InitDB() (*gorm.DB, error) {
 	}
 
 	// Auto-migrate URL model
-	err = database.AutoMigrate(&models.URL{})
-	if err != nil {
+	if err := database.AutoMigrate(&models.URL{}); err != nil {
 		return nil, fmt.Errorf("failed to auto-migrate URL schema: %w", err)
 	}
 
