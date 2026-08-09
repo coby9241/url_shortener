@@ -9,9 +9,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"github.com/gin-contrib/cors"
 	"strings"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 
 	"url_shortener/controllers"
 	"url_shortener/db"
@@ -37,6 +38,7 @@ func main() {
 		salt = "fixed_salt_change_in_production" // default for development
 	}
 	controller := controllers.NewURLController(repo, baseURL, salt)
+	healthController := controllers.NewHealthController()
 
 	r := gin.New()
 	r.Use(gin.Logger())
@@ -60,11 +62,12 @@ func main() {
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
 		AllowCredentials: true,
-		MaxAge: 12 * time.Hour,
+		MaxAge:           12 * time.Hour,
 	}))
 	r.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Not found"})
 	})
+	r.GET("/health", healthController.HealthCheck)
 	r.POST("/api/v1/shorten", controller.ShortenURL)
 	r.GET("/:shortURL", controller.RedirectURL)
 
