@@ -14,7 +14,7 @@ generate-mocks:
 	@echo "Generating mocks..."
 	@which mockery >/dev/null 2>&1 || { \
 		echo "mockery not found. Installing..."; \
-		go install github.com/vektra/mockery/v2@v2.28.2; \
+		go install github.com/vektra/mockery/v2@v2.53.6; \
 	}
 	cd server && mockery --dir=./repositories --output=./mocks --all --keep-header --filename=mock_{interface}.go
 	@echo "Mocks generated successfully in ./server/mocks/"
