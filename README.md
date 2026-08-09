@@ -3,6 +3,7 @@
 A modern URL shortener application built with a Go backend and React frontend, using PostgreSQL for data storage.
 
 ## Table of Contents
+- [Deployment](#deployment)
 - [Requirements](#requirements)
 - [Getting Started](#getting-started)
   - [Using Docker Compose (Recommended)](#using-docker-compose-recommended)
@@ -13,6 +14,16 @@ A modern URL shortener application built with a Go backend and React frontend, u
 - [Running Tests](#running-tests)
 - [Screenshots](#screenshots)
 - [Further Help](#further-help)
+
+## Deployment
+
+The application is deployed on Render with the following URL:
+- Web UI: https://url-shortener-ui-wibi.onrender.com
+
+The deployment consists of:
+- Static frontend hosted on Render's static site service
+- Backend API running in a Docker container on Render
+- PostgreSQL database provided by Render
 
 ## Requirements
 - Docker and Docker Compose
